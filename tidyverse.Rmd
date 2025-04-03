@@ -1,0 +1,115 @@
+---
+title: "Clean a data set with tidyverse functions"
+author: "DABIRE Ives Ulrich"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## I. Présentation du package
+
+**tidyverse** est une collection de packages R conçus pour travailler ensemble et basés sur une philosophie commune (le traitement "l'organisation" des données). Il permet de faciliter l'analyse et la manipulation des données en utilisant une approche cohérente et intuitive.
+
+**tidyverse** est en grande partie issues du travail d’Hadley
+Wickham.
+
+C'est une collection de package permettant d'effectuer un grand nombre d'opérations : 
+- la visualisation
+- la manipulation des tableaux de données
+- l'import/export de données
+- la manipulation de variables
+- l'extraction de données du Web
+- la programmation
+
+On peut Installez le tidyverse complet avec la commande :
+
+```{r}
+install.packages("tidyverse")
+```
+
+Cette commande va en fait installer plusieurs extensions qui constituent le “coeur” du tidyverse, à savoir :
+- ggplot2 (visualisation)
+- dplyr (manipulation des données)
+- tidyr (remise en forme des données)
+- purrr (programmation)
+- readr (importation de données)
+- tibble (tableaux de données)
+- forcats (variables qualitatives)
+- stringr (chaînes de caractères)
+
+A présent on peut chargé l'extension tidyverse installée. Cela chargera l'ensemble des package contenu dans la collection.
+
+```{r}
+library(tidyverse)
+```
+
+
+
+## Importation d'un jeu de données 
+
+- Installation d'un package de bases de données médicales
+
+```{r, message=FALSE}
+install.packages("medicaldata")
+```
+
+- Chargement du package de bases de données
+
+```{r}
+library(medicaldata)
+```
+
+- Afficher la liste des bases de données contenues dans le package de base de données avec la commande data(package = "medicaldata")
+
+```{r}
+data(package = "medicaldata")
+```
+
+- Choisissez la base que vous souhaitez utiliser et donnez lui un nom
+
+```{r}
+base = medicaldata::blood_storage 
+```
+
+- Visualiser la base de données choisi
+
+```{r}
+view(base)
+#base
+glimpse(base)
+```
+
+```{r}
+git init
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
