@@ -86,9 +86,9 @@ glimpse(base)
 #C'est de la blague
 ```
 
-## Doublons, manipulation des lignes, colonnes, dates, recodage de variables
+### Détection des doublons, manipulation des lignes, colonnes, dates, recodage de variables
 
-#### Doublons
+#### Détection des Doublons
 ```{r}
  base[duplicated(base),]
 #Ou
@@ -195,6 +195,213 @@ base %>%
   count(RBC.Age.Group) %>% 
   mutate(frequence = n / sum(n))
 ```
+
+
+
+### Module 3 : data cleaning part 2
+#### Missing values, logical recoding, age categories, applying changes to columns
+
+#### Missing values
+```{r}
+#Détection des valeurs manquantes
+colSums(is.na(base))
+
+##Sélection des lignes où au moins une variable contient une valeur manquante
+base %>% filter(if_any(everything(), is.na))
+
+
+##Compter le nombre de valeurs manquantes par colone
+base %>% summarise(across(.fns= ~sum(is.na(.)))) %>% 
+  pivot_longer(everything()) 
+
+#ou
+base %>% map_df(~sum(is.na(.))) %>% gather()  ##Plus efficace quand il y'a le besoin de rapidité dans le traitement
+base %>% 
+  summarise_all(~sum(is.na(.))) %>% 
+  gather()
+
+#Sélection des variables qui ne contiennent pas de valeurs manquantes
+base %>% select_if(~!any(is.na(.)))
+
+#Sélection des lignes où la variable TVol ne contient pas de valeurs manquantes
+base %>% drop_na(TVol) %>% summarise_all(~sum(is.na(.))) %>% gather()
+
+#Suppression des valeurs manquantes
+base %>% drop_na()
+
+
+#Imputation
+library(imputeTS)
+TVol = na.mean(base$TVol, option = "median")
+sum(is.na(TVol))
+
+```
+
+
+#### age categories
+
+```{r}
+colnames(base)
+
+unique(base$Age)
+
+coupure = c(37, 47, 57, 67, 77, Inf) #Les seuils des intervalles d'âge
+
+base$tranche_age = cut(base$Age, breaks=coupure, c("[37-47[", "[47-57[", "[57-67[", "[67-77[", "77 et +"), right = FALSE)
+
+base$tranche_age
+glimpse(base)
+
+filter(base, Age==57)
+```
+
+
+#### logical recoding
+
+
+
+
+
+
+## Module 4 : summary tables (group and summarise with the janitor, dplyr and gtsummary packages, add appealing fomating with flextable package)
+
+##### group and summarise with the janitor
+
+Les principales fonctions du package janitor peuvent : 
+- formater parfaitement les noms de colonnes d’un data.frame ; 
+- fournir rapidement des décomptes de combinaisons de variables (c’est-à-dire des tableaux    de fréquence et des tableaux croisés) ; 
+- explorer les doublons dans les enregistrements; 
+- bien formater les résultats des tabulations (les fonctions de tabulation et de rapport reproduisent des fonctionnalités populaires de SPSS et de Microsoft Excel. 
+
+Le package *Janitor* suit les principes du tidyverse et fonctionne bien avec l’opérateur pipe %>% 
+
+###### Tabuler la variable RBC.Age.group (afficher les frequences de ses différentes modalités) avec la fonction tabyl
+```{r}
+library(janitor)
+
+tabyl(base$RBC.Age.Group)
+
+```
+
+
+##### Combiné tabyl avec la suite adorn_* pour un formater votre tableau à votre guise
+
+```{r}
+#Croisement entre RBC.Age.Group par T.Stage
+colnames(base)
+base$T.Stage
+base %>%
+  tabyl(RBC.Age.Group, T.Stage) %>%
+  adorn_totals("col") %>%
+  adorn_percentages("row") %>%
+  adorn_pct_formatting(digits = 2) %>%
+  #adorn_ns() %>%
+  adorn_title()
+
+
+#Doublons
+get_dupes(base, RBC.Age.Group, T.Stage)
+
+```
+
+Au sein du groupe 1 83,02% des individus appartiennent au T.Stage 1, 14,15% au T.satge 2 et 2,83% d'entre eux n'ont été assigné à aucun T.Stage.
+...
+
+
+##### Diagnostique rapide des relations entre les variables de votre base 
+```{r}
+base %>%
+  get_one_to_one()
+
+```
+Il ressort que notre base de données contient deux groupes de variables liées entre elles. 
+- Le premiers est constitué des variables "RBC.Age.Group" et "Median.RBC.Age" qui sont significativement correlées
+- Le second est constitué des variables "Recurrence" et "Censor" qui sont significativement correlées
+Il est par ailleurs possible d'utiliser la fonction cor() de la library stats pour une analyse plus approfoncfie. Cette fonction retourne les coefficients de correlations des relations entre chacune des variables.
+
+
+```{r}
+#Manipulation des dates : traité des dates stockées comme nombre entiers dans excel
+excel_numeric_to_date(41103.01, include_time = TRUE) # retourn un objet de type POSIXlt 
+
+#Lorsque la variable date contient à la fois des modalités au format date ainsi que des modalités au format nombre entier, la fonction convert_to_date() peut s'averer plus adapté
+
+dates = c("2020-02-29", "40000.1")
+convert_to_date(dates)
+
+#On peut aussi directement utiliser les fonctions as.POSIXct() ou as.POSIXlt
+
+```
+
+##### Tablulations avec gtsummary
+
+- Statistiques descriptives avec tbl_summary()
+
+```{r}
+library(gtsummary)
+library(litedown)
+
+#Brèves tatistiques descriptives de la base 
+base %>% tbl_summary()
+
+#Brèves statiques descriptives des variables "Age" et "RBC.Age.Group"
+base %>%
+  tbl_summary(include = c(Age, RBC.Age.Group))
+
+```
+
+- Statistiques descriptives de variables en fonction d'une variable catégorielle : Le paramètre "by" permets de résumer chacune des variables inclues en fonction d’une variable catégorielle
+
+```{r}
+base %>%
+  tbl_summary(
+    include = c(Age, T.Vol, PreopPSA, RBC.Age.Group),
+    by = RBC.Age.Group
+  )
+
+#On peut rajouer la fonction add_overall() afin de rajouter une colone pour le total. L'option last=TRUE permet de mettre la colone total à la fin du tableau
+base %>%
+  tbl_summary(
+    include = c(Age, T.Vol, PreopPSA, RBC.Age.Group),
+    by = RBC.Age.Group
+  ) %>%
+  add_overall(last = TRUE, col_label = "**Ensemble** (effectif total: {N})")
+
+```
+
+
+- Il est possible de définir les statistics à afficher pour les variables que nous souhaitons tabuler. Par exemple, nous pouvons afficher l'age moyen, median et son 3e quartil; le T.Vol moyen, median et son 3e quartil.
+
+```{r}
+base %>%
+  tbl_summary(
+    include = c(Age, T.Vol, PreopPSA, RBC.Age.Group)
+    statistic = all_continuous() ~ "Moy. : {mean} [min-max : {min} - {max}] 3e_quart. :{p75}"
+  )
+
+#Pour effectuer la même opération Par RBC.Age.Group,
+base %>%
+  tbl_summary(
+    include = c(Age, T.Vol, PreopPSA, RBC.Age.Group),
+    by = RBC.Age.Group,
+    statistic = all_continuous() ~ "Moy. : {mean} [min-max : {min} - {max}] 3e_quart. :{p75}"
+  )
+
+#Résumons dans un tableau les Caractéristiques (Méd, Moyenne etc.) en spécifiant le nom des variables pour lesquels nous voulons ces statistique. Nous afficherons des statistiques différentes pour chacune des variables. 
+base %>%
+  tbl_summary(
+    include = c(Age, PreopPSA),
+    statistic = list(
+      Age ~ "Méd. : {median} [{p25} - {p75}]",
+      PreopPSA ~ "Moy. : {mean} ({sd})"
+    )
+  )
+
+```
+
+
+
+
 
 
 
