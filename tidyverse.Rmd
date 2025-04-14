@@ -333,7 +333,10 @@ convert_to_date(dates)
 
 ```
 
-##### Tablulations avec gtsummary
+##### Tablulations avec le package gtsummary
+
+Le package **gtsummary** offre un moyen élégant et flexible de créer des tableaux analytiques et récapitulatifs prêts à être publiés.
+Le package **gtsummary** permet de résumer des ensembles de données, des modèles de régression, et bien plus encore. Il offre de nombreuses possibilités de personnalisation.
 
 - Statistiques descriptives avec tbl_summary()
 
@@ -400,13 +403,52 @@ base %>%
 ```
 
 
+##### Pour aller plus loin dans gtsummary
+```{r}
+#Considerons le modèle de regression linéaire suivant
+mod1 = glm(response ~ trt + age + grade, trial, family = binomial)
+
+t1 = tbl_regression(mod1, exponentiate = TRUE)
+
+#Considerons le second modèle suivant
+library(survival)
+
+# build survival model table
+t2 = coxph(Surv(ttdeath, death) ~ trt + grade + age, trial) %>%
+  tbl_regression(exponentiate = TRUE)
+
+# merge tables
+tbl_merge_ex1 =
+  tbl_merge(
+    tbls = list(t1, t2),
+    tab_spanner = c("**Tumor Response**", "**Time to Death**")
+  )
+colnames(base)
+
+```
+
+
+##### Mise en forme de tableaux avec la library flextable
+```{r}
+library(flextable)
+ft = flextable(base[1:5,c("RBC.Age.Group", "Median.RBC.Age", "Age", "AA")])
+ft = add_header_row(ft,
+  colwidths = c(3, 1),
+  values = c("Variables sur l'âge", "AA")
+)
+ft = theme_vanilla(ft)
+ft = add_footer_lines(ft, "Visualisation des 5 premièles lignes de la base")
+ft = color(ft, part = "footer", color = "#666666")
+ft = set_caption(ft, caption = "Base de données blood_storage")
+ft
+```
 
 
 
 
 
 
-## Merci
+## Merci famille
 ## Je vous en prie
 
 
