@@ -198,7 +198,7 @@ base %>%
 
 
 
-### Module 3 : data cleaning part 2
+## Module 3 : data cleaning part 2
 #### Missing values, logical recoding, age categories, applying changes to columns
 
 #### Missing values
@@ -440,8 +440,75 @@ ft = theme_vanilla(ft)
 ft = add_footer_lines(ft, "Visualisation des 5 premièles lignes de la base")
 ft = color(ft, part = "footer", color = "#666666")
 ft = set_caption(ft, caption = "Base de données blood_storage")
+#ft = add_footer_row(ft)
 ft
 ```
+
+
+
+## Visualisation des données avec ggplot2
+ggplot2 est un package de représentations graphiques qui fournit des commandes utiles pour créer des graphiques complexes à partir des données d'un bloc de données. Il offre une interface plus intuitive pour spécifier les variables à representer, leur mode d'affichage et leurs propriétés visuelles générales. Ainsi, des modifications minimes sont nécessaires en cas de modification des données sous-jacentes ou de passage d'un graphique à barres à un graphique en nuage de points. Cela permet de créer des graphiques de qualité publiable avec un minimum d'ajustements.
+
+```{r}
+library(tidyverse)
+ggplot(data = surveys_complete)
+```
+
+
+
+## Module 8 : Transformation de données (fusion de deux ou plusieurs ensembles de données; pivoter la structure des données; Facteurs ordinaux (ordinal factors))
+
+#### fusion de deux ou plusieurs ensembles de données
+
+Supposons que l'on dispose de deux bases de données df1 et df2. Ces deux bases de données peuvent être fusionner de plusieurs façons :  
+- garder toutes les lignes de df1 et df2, en mettant des NA s’il n’y a pas de correspondance;
+
+- Conserver toutes les observations de la table d'origine (garder toutes les lignes de df1, même si celles-ci n'ont aucune correspondance dans df2)
+
+- Conserver toutes les observations de la table de destination (Garde toutes les lignes de df2, même sans correspondance dans df1)
+
+- Exclut toutes les lignes sans correspondance (Garde seulement les lignes qui ont des correspondances dans les deux tables)
+
+- Considerons les deux bases de données suivantes
+```{r}
+df1 = tibble("nom" = c("Jean", "Mohamed", "Oscar"),
+               "âge" = c(25, 26, 28),
+               "fruit_pref" = c("mangue", "papaye", "goyave"))
+
+df2 = tibble("nom" = c("Ali", "Jean", "Pierre", "Oscar"),
+               "job" = c("telecom", "medecine", "police", "football"))
+
+df1 = as.data.frame(base1)
+df2 = as.data.frame(base2)
+```
+
+
+- Fusion des deux bases en conservant toutes lignes de chacune d'elles
+```{r}
+total = merge(df1, df2,by="nom", all = TRUE)
+total
+```
+
+- Fusion de deux bases de données en conservant toutes les lignes de la première (les lignes de la seconde base qui ne trouvent pas de correspondance seront affectées par les valeurs NA)
+
+```{r}
+total_x = merge(df1, df2, by = "nom",  all.x = TRUE)
+total_x
+```
+
+- Fusion de deux bases de données en conservant toutes les lignes de la seconde (les lignes de la première base qui ne trouvent pas de correspondance seront affectées par les valeurs NA)
+```{r}
+total_y = merge(df1, df2, by = "nom",  all.y = TRUE)
+total_y
+```
+
+#### pivoter la structure des données
+
+
+
+
+
+
 
 
 
