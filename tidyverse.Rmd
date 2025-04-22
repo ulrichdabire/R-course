@@ -503,13 +503,109 @@ total_y
 ```
 
 #### pivoter la structure des données
+Considérons le jeux de données **relig_income** de R. Ce jeux de données contient des informations sur le revenu annuel des individus issues de diverses religion. 
+Les plages de revenus sont en ligne. Cepandant, pour des raisons pratiques (creation de filtre sur un dasboard, utilisation de la variable revenu dans un modèle de regression, etc.), il pourrait être plus approprié de disposer d'une variable *plage de revenu* et d'une variable *effectif* qui compte le nombre de personnes correspondants à chacun des différents niveaux de revenu.
+
+```{r}
+relig_income
+```
+
+- Faisons pivoter la base de données avec pivot_longer()
+
+```{r}
+pivo_long = relig_income %>% 
+  pivot_longer(
+    cols = !religion, 
+    names_to = "income", 
+    values_to = "count"
+  )
+
+pivo_long
+```
+
+
+- Le premier argument est le jeu de données à remodeler, relig_income.
+
+- cols décrit quelles colonnes doivent être remodelées. Dans ce cas, ce sont toutes les colonnes sauf religion.
+
+- names_to indique le nom de la variable qui sera créée à partir des noms de colonnes, c’est-à-dire income (revenu).
+
+- values_to indique le nom de la variable qui sera créée à partir des valeurs contenues dans les cellules, c’est-à-dire count (nombre).
+
+
+- Redimensionnons la base à sa forme d'origine avec pivot_wider():  
+
+```{r}
+pivo_long %>% 
+  pivot_wider(
+    names_from = income, 
+    values_from = count
+    #values_fill = 0
+  )
+```
+
+
+#### Ordinal factors
+
+Dans cette partie, nous apprendrons à créer des variables de type `factor` (facteur) dans R et comment ajuster les niveaux de ces facteurs.
+En R, une variable factor (ou facteur) est un type de variable utilisé pour représenter des données catégorielles.
+
+Un factor est une variable qui prend un nombre limité de valeurs distinctes, appelées niveaux (levels), souvent utilisées pour représenter :
+
+Des catégories qualitatives nominales (ex : sexe = "Homme", "Femme")
+
+Des catégories ordinales (ex : satisfaction = "Faible", "Moyenne", "Élevée")
+
+- Supposons qu'on ait enquêté dans des fermes sur l’état de santé de bovins. 
+```{r}
+
+donnees = data.frame(
+  animal_id = 1:6,
+  espece = c("Bovin", "Bovin", "Bovin", "Bovin", "Bovin", "Bovin"),
+  etat_sante = c("Bon", "Mauvais", "Moyen", "Bon", "Mauvais", "Moyen"),
+  vaccine = c("Oui", "Non", "Oui", "Oui", "Non", "Non")
+)
+
+```
+
+L'objectif est de :
+- s’assurer que etat_sante et vaccine soient bien des facteurs
+
+- donner un ordre aux niveaux de etat_sante (car c’est une variable ordinale)
+
+- étudier l’effet de la vaccination sur l’état de santé
+
+```{r}
+# Convertir en facteurs
+donnees$etat_sante = factor(donnees$etat_sante, 
+                             levels = c("Mauvais", "Moyen", "Bon"), 
+                             ordered = TRUE)
+
+donnees$vaccine = factor(donnees$vaccine)
+
+# Afficher la structure
+str(donnees)
+
+```
+
+```{r}
+# Tableau croisé
+table(donnees$vaccine, donnees$etat_sante)
+
+# Pour visualiser
+library(ggplot2)
+ggplot(donnees, aes(x = etat_sante, fill = vaccine)) +
+  geom_bar(position = "dodge") +
+  labs(title = "État de santé des bovins selon la vaccination")
+
+```
+
+## Module 9 : représentations graphiques en santé publique
 
 
 
 
-
-
-
+## Module 10 : cas pratique : covi-19
 
 
 
