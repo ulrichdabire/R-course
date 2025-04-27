@@ -275,7 +275,7 @@ Les principales fonctions du package janitor peuvent :
 
 Le package *Janitor* suit les principes du tidyverse et fonctionne bien avec l’opérateur pipe %>% 
 
-###### Tabuler la variable RBC.Age.group (afficher les frequences de ses différentes modalités) avec la fonction tabyl
+#### Tabuler la variable RBC.Age.group (afficher les frequences de ses différentes modalités) avec la fonction tabyl
 ```{r}
 library(janitor)
 
@@ -446,13 +446,90 @@ ft
 
 
 
-## Visualisation des données avec ggplot2
+## Module 5 : Visualisation des données avec ggplot2
 ggplot2 est un package de représentations graphiques qui fournit des commandes utiles pour créer des graphiques complexes à partir des données d'un bloc de données. Il offre une interface plus intuitive pour spécifier les variables à representer, leur mode d'affichage et leurs propriétés visuelles générales. Ainsi, des modifications minimes sont nécessaires en cas de modification des données sous-jacentes ou de passage d'un graphique à barres à un graphique en nuage de points. Cela permet de créer des graphiques de qualité publiable avec un minimum d'ajustements.
 
 ```{r}
 library(tidyverse)
+#data(survey_complete)
 ggplot(data = surveys_complete)
 ```
+
+- Installer le package Esquisse. Ce denier permet l'installation de l'interface ggplot2 builder. 
+- Une fois Esquisse installé, allez dans Addins et cliquez sur ggplot2 builder. 
+
+<p align="center">
+  <img src="addins_ggplot_builder.png" width="500" />
+</p>
+
+Ou
+
+![Texte alternatif de l'image](addins_ggplot_builder.png)
+
+
+- Cela vous ouvrira l'interface Esquisse à partir duquel Vous pourrez  construire vos graphiques et les personnaliser à travers des "drag and drop" de vos variables d'étude. Un code R (ggplot2) que vous pourrez copier et coller dans votre markdown est généré au fur et à mesure que vous faites des modifications. 
+
+<p align="center">
+  <img src="interface_esquisse.png" width="500" />
+</p>
+
+Ou
+
+![Texte alternatif de l'image](interface_esquisse.png)
+
+
+```{r}
+ggplot(base) +
+  aes(x = tranche_age) +
+  geom_bar(fill = "#2B77FF") +
+  labs(
+    x = "Tranches d'âge",
+    y = "Effectif",
+    title = "Repartition de la population suivant la tranche d'âge"
+  ) +
+  coord_flip() +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold",
+    hjust = 0.5),
+    axis.text.y = element_text(face = "italic")
+  )
+
+
+```
+
+
+```{r}
+ggplot(base) +
+  aes(x = PVol, y = tranche_age) +
+  geom_boxplot(fill = "#3179FB") +
+  labs(
+    x = "PVol",
+    y = "Tranche d'âge",
+    title = "Distribution des PVol en fonction du groupe d'âge"
+  ) +
+  coord_flip() +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold",
+    hjust = 0.5),
+    axis.text.x = element_text(face = "italic")
+  )
+
+```
+
+
+## Module 6 : resolution des erreurs et recherche d'aide.
+
+
+
+
+
+
+#Module 7 : Rapport automatiques
+
+
+
 
 
 
