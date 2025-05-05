@@ -3,6 +3,8 @@ title: "Clean a data set with tidyverse functions"
 author: "DABIRE Ives Ulrich"
 date: "`r Sys.Date()`"
 output: html_document
+#toc: TRUE
+#toc_deepth: 4
 ---
 
 ```{r setup, include=FALSE}
@@ -526,11 +528,21 @@ ggplot(base) +
 
 
 
-#Module 7 : Rapport automatiques
+#Module 7 : Rapports automatiques avec Rmarkdown
+RMarkdown est un outil puissant qui vous permet de créer des rapports dynamiques et reproductibles en intégrant de manière transparente du code R, des résultats et du texte explicatif.
 
+### Les parties clef d'un document R markdown
+  - **En-tête YAML** : Contient des métadonnées telles que le titre, l’auteur, la date et le format de sortie.
 
+  - **Contenu en Markdown** : La partie narrative de votre rapport où vous expliquez votre analyse.
 
+  - **Blocs de code** : Sections de code R exécutées lors du rendu pour afficher les résultats.
 
+configuration de l'en-tête
+
+Considerons le cas pratique suivant : 
+
+[téléchagez MiKTeX](https://miktex.org/download)
 
 
 ## Module 8 : Transformation de données (fusion de deux ou plusieurs ensembles de données; pivoter la structure des données; Facteurs ordinaux (ordinal factors))
@@ -580,7 +592,7 @@ total_y
 ```
 
 #### pivoter la structure des données
-Considérons le jeux de données **relig_income** de R. Ce jeux de données contient des informations sur le revenu annuel des individus issues de diverses religion. 
+Considérons le jeux de données **relig_income** de R. Ce jeux de données contient des informations sur le revenu annuel des individus issues de diverses religions. 
 Les plages de revenus sont en ligne. Cepandant, pour des raisons pratiques (creation de filtre sur un dasboard, utilisation de la variable revenu dans un modèle de regression, etc.), il pourrait être plus approprié de disposer d'une variable *plage de revenu* et d'une variable *effectif* qui compte le nombre de personnes correspondants à chacun des différents niveaux de revenu.
 
 ```{r}
@@ -678,6 +690,8 @@ ggplot(donnees, aes(x = etat_sante, fill = vaccine)) +
 ```
 
 ## Module 9 : représentations graphiques en santé publique
+
+
 
 
 
