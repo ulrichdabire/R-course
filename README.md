@@ -1,7 +1,7 @@
 # 📘 Introduction au Logiciel R
 
 Bienvenue dans ce dépôt GitHub consacré à l’**enseignement du logiciel R**.  
-Ce cours s’adresse aux étudiants et professionnels souhaitant découvrir ou approfondir leur maîtrise de R pour l’analyse de données, la visualisation, la programmation statistique, etc.
+Ce cours s’adresse aux étudiants et professionnels souhaitant découvrir ou approfondir leur maîtrise de R pour le traitement, l’analyse ou la visualisation de données
 
 ---
 
