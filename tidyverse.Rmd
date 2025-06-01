@@ -317,7 +317,7 @@ base %>%
 
 ```
 Il ressort que notre base de données contient deux groupes de variables liées entre elles. 
-- Le premiers est constitué des variables "RBC.Age.Group" et "Median.RBC.Age" qui sont significativement correlées
+- Le premier est constitué des variables "RBC.Age.Group" et "Median.RBC.Age" qui sont significativement correlées
 - Le second est constitué des variables "Recurrence" et "Censor" qui sont significativement correlées
 Il est par ailleurs possible d'utiliser la fonction cor() de la library stats pour une analyse plus approfoncfie. Cette fonction retourne les coefficients de correlations des relations entre chacune des variables.
 
@@ -691,7 +691,194 @@ ggplot(donnees, aes(x = etat_sante, fill = vaccine)) +
 
 ## Module 9 : représentations graphiques en santé publique
 
+```{r}
+library(readr)
+WHO_COVID_19_global_data = read_csv("WHO-COVID-19-global-data.csv")
+View(WHO_COVID_19_global_data)
 
+sante_ehcvm = read_csv("s03_me_bfa2018.csv")
+
+```
+
+```{r}
+library(tidyverse)
+
+WHO_COVID_19_global_data %>%
+  filter(WHO_region == "AFRO" & year(Date_reported) == 2023) %>%
+  ggplot() +
+  aes(x = reorder(Country, New_cases), y = New_cases) +
+  geom_col(fill = "#3A7EF8") +
+  coord_flip() +
+  theme_light()
+
+
+
+#unique(WHO_COVID_19_global_data$Country)
+```
+
+La Mauritanie est le pays de africain ayant le plus grand nombre de nouveau cas de covid en 2023 (x nouveaux cas). Elle est suivi par l'Afrique du Sud (), la Zambie () et le Zimbabwé (). Les pays tels que le Niger (), le Tchad, la Gambie () etc. se caracterise par des nombres de nouveaux cas plus faibles.
+
+```{r}
+# Preparation des données : somme des nouveaux cas par pays
+pie_data = WHO_COVID_19_global_data %>%
+  filter(Country %in% c("France", "United States of America", "Russian Federation", "Japan", "Canada", "Italy", "Germany", "China")) %>% 
+  group_by(Country) %>%
+  summarise(New_cases = sum(New_cases, na.rm = TRUE)) %>%
+  arrange(desc(New_cases)) %>%
+  mutate(
+    fraction = New_cases / sum(New_cases),
+    ymax = cumsum(fraction),
+    ymin = c(0, head(ymax, n = -1)),
+    label = paste0(Country, " (", round(fraction * 100, 1), "%)")
+  )
+
+
+# Plot pie chart
+ggplot(pie_data) +
+  geom_rect(aes(ymin = ymin, ymax = ymax, xmin = 0, xmax = 1, fill = Country)) +
+  coord_polar(theta = "y") +
+  theme_void() +
+  geom_text(aes(x = 1.3, y = (ymin + ymax) / 2, label = label), size = 3) +
+  labs(title = "Répartition des nouveaux cas COVID-19 par pays") +
+  theme(legend.position = "none")
+
+#unique(WHO_COVID_19_global_data$Country)
+
+```
+
+Depuis l'apparution de la maladie en 2019, la Chine est le pays qui a enregistré le plus grand nombre de nouveaux cas. Pour apprecier l'ampleur de l'incidance de la maladie dans le pays, 26,8% de l'ensemble des nouveaux cas de covid-19 dans les pays du G8 étandue à la Chine ont été enregistrés en Chine. 
+
+
+
+- Evolution des nouveaux cas de covid-19b au Burkina Faso et au Sénégal
+
+```{r}
+base_red %>% 
+  filter(Country %in% c("Burkina Faso","Senegal")) %>% 
+  ggplot +
+  aes(x = Date_reported, y = New_cases, colour = Country) +
+  geom_line() +
+  scale_color_hue(direction = 1) +
+  theme_minimal()
+```
+
+
+```{r}
+# base_red %>%
+#  filter(Country_code %in% "SN") %>%
+#  filter(Country %in% "Senegal") %>%
+#  ggplot() +
+#   aes(x = Date_reported, y = New_cases) +
+#   geom_line(colour = "#112446") +
+#   labs(
+#     y = "Count",
+#     colour = "Legend",
+#     title = "Évolution des nouveau cas de COVID-19 au Sénégal",
+#     x = "Date"
+#   ) +
+#   theme_minimal()
+
+base_red %>%
+  filter(Country_code == "SN", Country == "Senegal") %>%
+  ggplot(aes(x = Date_reported)) +
+  geom_line(aes(y = New_cases, colour = "New Cases"), size = 1) +
+  geom_line(aes(y = New_deaths, colour = "New Deaths"), size = 1) +
+  scale_colour_manual(values = c("New Cases" = "#112446", "New Deaths" = "#E63946")) +
+  labs(
+    y = "Count",
+    colour = "Legend",
+    title = "Évolution des nouveau cas et décès COVID-19 au Sénégal",
+    x = "Date"
+  ) +
+  theme_minimal()
+
+
+```
+
+Lorsque l'on considère le Sénégal où l'incidence de la maladie est plus importante, le nombre de décès est beaucoup plus faibles comparartivent à la progression des nouveaux cas. De nombreuses personnes contractent la maladie et très peu en décèdent.
+
+
+- Histogramme des nouveaux cas par tranche d'âge
+
+
+
+
+- Cascading Water-fall graph
+
+
+
+- Nuage de points
+```{r}
+ggplot(WHO_COVID_19_global_data) +
+  aes(x = New_cases, y = New_deaths) +
+  geom_point(colour = "#3E7FF3") +
+  labs(
+    x = "Nouveaux cas",
+    y = "Décès",
+    title = "Représentation des décès en fonction des nouveaux cas"
+  ) +
+  theme_minimal()
+
+```
+
+Le nombre décès est positivement correlé à l'occurence de nouveaux cas. L'on doit s'attendre à plus de décès au fur et à mesure que la maladie progresse.
+
+
+
+```{r}
+install.packages(c("leaflet", "dplyr", "rnaturalearth", "rnaturalearthdata", "sf"))
+
+```
+
+
+```{r}
+library(leaflet)
+library(dplyr)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+
+# Supposons que ta base s'appelle WHO_COVID_19_global_data
+# et contient les colonnes ISO3 (code pays) et Cumulative_deaths
+# Exemple : head(WHO_COVID_19_global_data)
+#   Country        ISO3     Cumulative_deaths
+#   "France"       "FRA"    400000
+#   "United States" "USA"   1200000
+
+# Charger la carte du monde avec les codes ISO
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Joindre avec ta base WHO_COVID_19_global_data
+world_covid <- world %>%
+  left_join(WHO_COVID_19_global_data, by = c("iso_a2" = "Country_code"))
+
+# Créer les info-bulles
+popup_info <- paste0(
+  "<strong>Pays : </strong>", world_covid$name, "<br/>",
+  "<strong>Décès cumulés : </strong>", ifelse(is.na(world_covid$Cumulative_deaths), "Données indisponibles", world_covid$Cumulative_deaths)
+)
+
+# Carte interactive
+leaflet(world_covid) %>%
+  addTiles() %>%
+  addPolygons(
+    fillColor = ~colorNumeric("Reds", Cumulative_deaths, na.color = "#cccccc")(Cumulative_deaths),
+    weight = 1,
+    opacity = 1,
+    color = "white",
+    dashArray = "3",
+    fillOpacity = 0.7,
+    highlightOptions = highlightOptions(
+      weight = 2,
+      color = "#666",
+      dashArray = "",
+      fillOpacity = 0.9,
+      bringToFront = TRUE
+    ),
+    label = lapply(popup_info, HTML)
+  )
+
+```
 
 
 
