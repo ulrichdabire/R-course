@@ -318,7 +318,7 @@ base %>%
 ```
 Il ressort que notre base de données contient deux groupes de variables liées entre elles. 
 - Le premier est constitué des variables "RBC.Age.Group" et "Median.RBC.Age" qui sont significativement correlées
-- Le second est constitué des variables "Recurrence" et "Censor" qui sont significativement correlées
+- Le second est constitué des variables "Recurrence" et "Censor".
 Il est par ailleurs possible d'utiliser la fonction cor() de la library stats pour une analyse plus approfoncfie. Cette fonction retourne les coefficients de correlations des relations entre chacune des variables.
 
 
@@ -746,7 +746,7 @@ ggplot(pie_data) +
 
 ```
 
-Depuis l'apparution de la maladie en 2019, la Chine est le pays qui a enregistré le plus grand nombre de nouveaux cas. Pour apprecier l'ampleur de l'incidance de la maladie dans le pays, 26,8% de l'ensemble des nouveaux cas de covid-19 dans les pays du G8 étandue à la Chine ont été enregistrés en Chine. 
+Depuis l'apparution de la maladie en 2019, la Chine est le pays qui a enregistré le plus grand nombre de nouveaux cas. Pour apprecier l'ampleur de l'incidance de la maladie dans le pays, 26,8% de l'ensemble des nouveaux cas dans les pays du G8 étandue à la Chine ont été enregistrés dans ce dernier. 
 
 
 
